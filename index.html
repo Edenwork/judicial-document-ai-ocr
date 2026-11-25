@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>司法互助AI助理</title>
+  <link rel="stylesheet" href="judicial-design-system/design-tokens/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/components/overlays.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/pages/ocr.css">
+</head>
+<body>
+  <svg class="icon-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-table-2" viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="icon-circle-check-big" viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></symbol>
+    <symbol id="icon-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  </svg>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="主要導覽">
+      <div class="brand">
+        <img src="assets/logo-d.svg" width="44" alt="">
+        <div class="brand-copy"><strong>司法互助AI助理</strong><small>Mutual Legal Assistance</small></div>
+      </div>
+      <div class="sidebar-scroll">
+        <nav class="side-nav" aria-label="功能選單">
+          <a class="nav-item-btn active" href="index.html" data-ocr-route="ocr-documents" data-ocr-back
+            aria-label="文件清單" title="文件清單" aria-current="page">
+            <svg class="app-icon" aria-hidden="true"><use href="#icon-table-2"></use></svg><span>文件清單</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+    <div class="workspace">
+      <button class="icon-btn mobile-menu workspace-menu" id="mobileMenu" type="button"
+        aria-label="開啟導覽" aria-controls="sidebar" aria-expanded="false">
+        <svg class="app-icon" aria-hidden="true"><use href="#icon-menu"></use></svg>
+      </button>
+      <main>
+        <section class="page active" id="page-ocr-documents" aria-labelledby="ocrDocumentsTitle">
+          <div class="page-heading">
+            <h2 id="ocrDocumentsTitle" tabindex="-1">文件清單</h2>
+          </div>
+          <div class="panel overflow-hidden">
+            <div class="table-responsive">
+              <table class="data-table ocr-documents-table" aria-labelledby="ocrDocumentsTitle">
+                <thead>
+                  <tr>
+                    <th scope="col">文件名稱</th>
+                    <th scope="col">更新時間</th>
+                    <th scope="col">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="ocrDocumentsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="page" id="page-ocr-viewer" aria-labelledby="ocrViewerTitle">
+          <div class="ocr-back-action">
+            <a class="btn btn-outline-secondary" href="index.html" data-ocr-route="ocr-documents" data-ocr-back>
+              <svg class="app-icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>返回文件清單
+            </a>
+          </div>
+          <div class="panel ocr-viewer">
+            <header class="ocr-viewer-heading">
+              <h2 id="ocrViewerTitle" tabindex="-1">OCR 檢視器</h2>
+              <p id="ocrDocumentName" aria-live="polite"></p>
+            </header>
+            <p class="ocr-empty" id="ocrMissingDocument" hidden>找不到這份文件，請返回文件清單重新選擇。</p>
+            <div id="ocrDocumentContent" hidden>
+              <div class="ocr-toolbar">
+                <dl class="ocr-metrics" aria-label="文件辨識指標">
+                  <div class="ocr-metric-card">
+                    <dt>信心指數</dt>
+                    <dd id="ocrConfidence" aria-live="polite"></dd>
+                  </div>
+                  <div class="ocr-metric-card">
+                    <dt>品質</dt>
+                    <dd id="ocrQuality" aria-live="polite"></dd>
+                  </div>
+                </dl>
+                <div class="ocr-document-nav" role="group" aria-label="切換文件">
+                  <button class="btn btn-outline-primary" id="ocrPreviousDocument" type="button">上一份文件</button>
+                  <button class="btn btn-outline-primary" id="ocrNextDocument" type="button">下一份文件</button>
+                </div>
+              </div>
+              <div class="ocr-columns">
+                <section class="ocr-original" aria-labelledby="ocrOriginalTitle">
+                  <header class="ocr-pane-header">
+                    <h3 id="ocrOriginalTitle">原稿影像</h3>
+                    <p id="ocrPageNumber" aria-live="polite"></p>
+                  </header>
+                  <div class="ocr-original-content">
+                    <div class="ocr-thumbnails" id="ocrThumbnails" role="group" aria-label="選擇原稿頁次"></div>
+                    <div class="ocr-image-frame">
+                      <div class="ocr-page-preview">
+                        <img id="ocrPageImage" alt="">
+                        <svg class="ocr-box-overlay" id="ocrBoxOverlay" preserveAspectRatio="none" aria-hidden="true" hidden></svg>
+                        <span class="ocr-box-tooltip" id="ocrBoxTooltip" hidden></span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <section class="ocr-results" aria-labelledby="ocrResultsTitle">
+                  <header class="ocr-pane-header">
+                    <h3 id="ocrResultsTitle">識別結果</h3>
+                    <div class="ocr-tabs" role="tablist" aria-label="識別結果格式">
+                      <button id="ocrTextTab" type="button" role="tab" aria-selected="false" aria-controls="ocrTextPanel" tabindex="-1">辨識文字</button>
+                      <button id="ocrJsonlTab" type="button" role="tab" aria-selected="true" aria-controls="ocrJsonlPanel">JSONL</button>
+                    </div>
+                  </header>
+                  <div class="ocr-result-card" id="ocrTextPanel" role="tabpanel" aria-labelledby="ocrTextTab" hidden>
+                    <div class="ocr-recognized-text" id="ocrRecognizedText" role="region" aria-label="當頁辨識文字" tabindex="0"></div>
+                  </div>
+                  <div class="ocr-result-card" id="ocrJsonlPanel" role="tabpanel" aria-labelledby="ocrJsonlTab">
+                    <div class="ocr-result-actions">
+                      <button class="btn btn-outline-secondary btn-sm" id="ocrCopy" type="button">
+                        <svg class="app-icon" aria-hidden="true"><use href="#icon-copy"></use></svg>複製
+                      </button>
+                    </div>
+                    <pre class="ocr-jsonl" id="ocrJsonlBlock" role="region" aria-label="目前頁面的 JSONL 識別結果" tabindex="0"><code id="ocrJsonl"></code></pre>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="toast-stack" id="toastStack"></div>
+  <script src="js/core/app.js" defer></script>
+  <script src="assets/ocr/20261007_001-data.js" defer></script>
+  <script src="assets/ocr/demo-documents.js" defer></script>
+  <script src="js/features/ocr.js" defer></script>
+</body>
+</html>
